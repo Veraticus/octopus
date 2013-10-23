@@ -72,11 +72,16 @@ module Octopus::Model
         end
       end
 
+      def self.clear_active_connections_with_octopus!
+        connection_proxy.instance_variable_get('@shards').each_value {|pool| pool.release_connection }
+      end
+
       class << self
+        alias_method_chain :clear_active_connections!, :octopus
         alias_method_chain :connection, :octopus
         alias_method_chain :connection_pool, :octopus
       end
-    end
+      end
   end
 
   module InstanceMethods
